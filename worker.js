@@ -1,14 +1,12 @@
 const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
 const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID_HERE';
 
-export interface Env {}
-
 export default {
-	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+	async fetch(request, env, ctx) {
 		const url = new URL(request.url);
 		const path = url.pathname;
 
-		if (path === '/send' && request.method === 'GET') {
+		if (path === '/' && request.method === 'GET') {
 			const message = url.searchParams.get('message');
 			if (!message) {
 				return new Response('Missing message param', { status: 400 });
@@ -16,9 +14,9 @@ export default {
 			return sendTelegramMessage(message);
 		}
 
-		if (path === '/send' && request.method === 'POST') {
+		if (path === '/' && request.method === 'POST') {
 			try {
-				const body = await request.json() as { message: string };
+				const body = await request.json();
 				if (!body.message) {
 					return new Response('Missing message in body', { status: 400 });
 				}
@@ -32,7 +30,7 @@ export default {
 	},
 };
 
-async function sendTelegramMessage(text: string): Promise<Response> {
+async function sendTelegramMessage(text) {
 	const encodedText = encodeURIComponent(text);
 	const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodedText}&parse_mode=Markdown`;
 
